@@ -43,6 +43,11 @@ func (m noDirFS) Open(name string) (result http.File, err error) {
 }
 
 func main() {
+	if err := os.MkdirAll(videos_path, os.ModeDir); err != nil {
+		slog.Error("error creating path for storing videos", "error", err)
+		return
+	}
+
 	ticker := time.NewTicker(time.Minute)
 	go func() {
 		for range ticker.C {
