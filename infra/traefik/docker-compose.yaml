@@ -6,6 +6,8 @@ services:
     ports:
       - 80:80
       - 443:443
+    networks:
+      - backend-network
     deploy:
       restart_policy:
         condition: on-failure
@@ -27,7 +29,7 @@ services:
 
       - --providers.swarm.endpoint=unix:///var/run/docker.sock
       - --providers.swarm.exposedByDefault=false
-
+      - --providers.swarm.network=backend-network
 
       # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.letsencrypt.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
@@ -39,3 +41,7 @@ services:
 
 volumes:
   acmes:
+
+networks:
+  backend-network:
+    external: true

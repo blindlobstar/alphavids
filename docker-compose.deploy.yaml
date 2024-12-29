@@ -1,6 +1,8 @@
 services:
   betbot:
     image: ${REGISTRY}/${IMAGE}
+    networks:
+      - backend-network
     volumes:
       - videos:/videos
     # healthcheck:
@@ -24,3 +26,7 @@ services:
   
 volumes:
   videos:
+
+networks:
+  backend-network:
+    external: true
