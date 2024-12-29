@@ -25,4 +25,5 @@ networks:
 
 configs:
   grafana_config:
+    name: grafana-datasources-${VERSION}.yaml
     file: ./grafana-datasources.yaml

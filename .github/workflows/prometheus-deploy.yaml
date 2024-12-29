@@ -25,3 +25,5 @@ jobs:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       
       - run: docker stack deploy -c docker-compose.yaml prometheus --with-registry-auth
+        env:
+          VERSION: ${{ github.sha }}

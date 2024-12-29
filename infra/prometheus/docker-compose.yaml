@@ -65,6 +65,8 @@ networks:
 
 configs:
   prometheus_config:
+    name: prometheus-${VERSION}.yml
     file: ./prometheus.yml
   replicas_exporter_config:
+    name: config-${VERSION}.yml
     file: ./replicas-exporter/config.yml

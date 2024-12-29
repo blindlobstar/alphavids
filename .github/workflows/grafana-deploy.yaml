@@ -27,3 +27,4 @@ jobs:
       - run: docker stack deploy -c docker-compose.yaml grafana --with-registry-auth
         env:
           PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
+          VERSION: ${{ github.sha }}
