@@ -1,5 +1,5 @@
 services:
-  betbot:
+  alphavids:
     image: ${REGISTRY}/${IMAGE}
     networks:
       - backend-network
