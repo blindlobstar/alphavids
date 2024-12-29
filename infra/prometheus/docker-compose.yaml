@@ -1,7 +1,3 @@
-version: '3.8'
-volumes:
-  prometheus_data: {}
-
 services:
   node-exporter:
     image: prom/node-exporter:latest
@@ -16,6 +12,8 @@ services:
       - '--path.rootfs=/rootfs'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - backend-network
 
   prometheus:
     image: prom/prometheus:latest
@@ -47,6 +45,8 @@ services:
       - /var/run:/var/run:rw
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - backend-network
     
   replicas-exporter:
     image: sunbird/docker-service-replicas-exporter
@@ -58,10 +58,15 @@ services:
     configs:
       - source: replicas_exporter_config
         target: /etc/docker-service-replicas-exporter/config.yml
+    networks:
+      - backend-network
 
 networks:
   backend-network:
     external: true
+
+volumes:
+  prometheus_data: {}
 
 configs:
   prometheus_config:
