@@ -1,0 +1,26 @@
+services:
+  betbot:
+    image: ${REGISTRY}/${IMAGE}
+    volumes:
+      - videos:/videos
+    healthcheck:
+      test: "curl -f http://localhost:8080/health || exit"
+      interval: 10s
+      timeout: 2s
+      retries: 3 
+      start_period: 10s
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.alphavids.rule=Host(`alphavids.io`)
+        - traefik.http.routers.alphavids.entrypoints=websecure
+        - traefik.http.routers.alphavids.tls=true
+        - traefik.http.routers.alphavids.tls.certresolver=letsencrypt
+        - traefik.http.services.alphavids.loadbalancer.server.port=8080
+  
+volumes:
+  videos:

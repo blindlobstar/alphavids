@@ -1,0 +1,46 @@
+name: Deploy alphavids
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ${{ github.repository }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest    
+    
+    defaults:
+      run:
+        working-directory: ./
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: docker/login-action@v3.2.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Build and push prometheus Image
+        run: |
+          docker build . -t ${{ env.REGISTRY }}/${{ env.IMAGE }}
+          docker push ${{ env.REGISTRY }}/${{ env.IMAGE }}
+      
+      - uses: arwynfr/actions-docker-context@v2
+        with:
+          docker_host: ssh://${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}
+          context_name: 'deploy-context'
+          ssh_cert: ${{ secrets.SERVER_IP }} ${{ secrets.SERVER_PUBLIC_KEY }}
+          ssh_key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          use_context: true
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - run: docker stack deploy -c docker-compose.deploy.yaml aplhavids --with-registry-auth
+        env:
+          IMAGE: ${{ env.IMAGE }}
+          REGISTRY: ${{ env.REGISTRY }}
