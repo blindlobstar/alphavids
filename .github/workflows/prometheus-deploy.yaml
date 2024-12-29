@@ -24,8 +24,4 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       
-      - run: docker config create prometheus_config prometheus.yml
-
-      - run: docker config create replicas_exporter_config replicas-exporter/config.yml
-
       - run: docker stack deploy -c docker-compose.yaml prometheus --with-registry-auth
