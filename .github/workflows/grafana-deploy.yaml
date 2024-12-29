@@ -1,0 +1,29 @@
+name: Deploy grafana
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+      
+    defaults:
+      run:
+        working-directory: ./infra/grafana
+
+    steps:
+      - uses: actions/checkout@v4
+        
+      - uses: arwynfr/actions-docker-context@v2
+        with:
+          docker_host: ssh://${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_IP }}
+          context_name: 'deploy-context'
+          ssh_cert: ${{ secrets.SERVER_IP }} ${{ secrets.SERVER_PUBLIC_KEY }}
+          ssh_key: ${{ secrets.SERVER_PRIVATE_KEY }}
+          use_context: true
+        env:
+          ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+      - run: docker stack deploy -c docker-compose.yaml grafana --with-registry-auth
+        env:
+          PASSWORD: ${{ secrets.GRAFANA_ADMIN_PASSWORD }}
