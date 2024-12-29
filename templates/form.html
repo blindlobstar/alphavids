@@ -3,9 +3,9 @@
     <form hx-encoding="multipart/form-data" hx-post="/transcode" hx-swap="outerHTML"
         hx-indicator="#processing_indicator" hx-disabled-elt="find input[type='file'], find button">
         <input required type="file" id="upload" name="upload" accept="video/webm"
-            class="file-input file-input-bordered file-input-primary file-input-lg" />
+            class="file-input file-input-bordered file-input-primary md:file-input-lg" />
         <div class="flex flex-row mt-5 gap-3">
-            <button id="upload_btn" class="btn btn-lg btn-primary ">
+            <button id="upload_btn" class="btn md:btn-lg btn-primary ">
                 Convert
             </button>
             <div id="processing_indicator" class="htmx-indicator flex flex-row items-center">
