@@ -33,9 +33,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     configs:
-      prometheus_config:
-        external: true
-        file: /etc/prometheus/prometheus.yml
+      - prometheus_config
     networks:
       - backend-network
 
@@ -57,10 +55,16 @@ services:
     command: 
       - /etc/docker-service-replicas-exporter/config.yml
     configs:
-      replicas_exporter_config:
-        external: true
-        file: /etc/docker-service-replicas-exporter/config.yml
+      - replicas_exporter_config
 
 networks:
   backend-network:
     external: true
+
+configs:
+  prometheus_config:
+    external: true
+    file: /etc/prometheus/prometheus.yml
+  replicas_exporter_config:
+    external: true
+    file: /etc/docker-service-replicas-exporter/config.yml
