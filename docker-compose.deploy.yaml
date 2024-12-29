@@ -3,12 +3,12 @@ services:
     image: ${REGISTRY}/${IMAGE}
     volumes:
       - videos:/videos
-    healthcheck:
-      test: "curl -f http://localhost:8080/health || exit"
-      interval: 10s
-      timeout: 2s
-      retries: 3 
-      start_period: 10s
+    # healthcheck:
+    #   test: "curl -f http://localhost:8080/health || exit"
+    #   interval: 10s
+    #   timeout: 2s
+    #   retries: 3 
+    #   start_period: 10s
     deploy:
       restart_policy:
         condition: on-failure

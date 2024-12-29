@@ -141,7 +141,7 @@ func main() {
 	http.Handle("GET /metrics", promhttp.Handler())
 	http.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
 
-	slog.Info("Server started on :8080")
+	slog.Info("server started on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		slog.Error("error running server", "error", err)
 	}
