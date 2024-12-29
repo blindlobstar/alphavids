@@ -25,3 +25,7 @@ scrape_configs:
     scrape_interval: 15s
     static_configs:
       - targets: ["replicas-exporter:9258"]
+  
+  - job_name: "alphavids"
+    static_configs:
+      - targets: ["alphavids:8080"]
