@@ -18,7 +18,7 @@ services:
         max_attempts: 3
       labels:
         - traefik.enable=true
-        - traefik.http.routers.alphavids.rule=Host(`alphavids.io`)
+        - traefik.http.routers.alphavids.rule=(Host(`alphavids.io`) || Host(`www.alphavids.io`)) && !Path(`/metrics`) && !Path(`/health`)
         - traefik.http.routers.alphavids.entrypoints=websecure
         - traefik.http.routers.alphavids.tls=true
         - traefik.http.routers.alphavids.tls.certresolver=letsencrypt
