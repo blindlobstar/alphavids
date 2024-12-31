@@ -136,10 +136,10 @@ func main() {
 	http.HandleFunc("POST /transcode", transcodeHandler)
 	http.Handle("GET /videos/", http.StripPrefix("/videos/", http.FileServer(noDirFS{http.Dir(videos_path)})))
 	http.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(noDirFS{http.Dir("./static")})))
-	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("GET /upload-form", uploadFormHandler)
 	http.Handle("GET /metrics", promhttp.Handler())
 	http.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
+	http.HandleFunc("GET /{$}", indexHandler)
 
 	slog.Info("server started on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
