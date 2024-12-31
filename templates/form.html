@@ -1,6 +1,6 @@
 {{define "form"}}
-<div>
-    <form hx-encoding="multipart/form-data" hx-post="/transcode" hx-swap="outerHTML"
+<div id="form_wrapper">
+    <form hx-encoding="multipart/form-data" hx-post="/transcode" hx-target="#form_wrapper" hx-swap="outerHTML"
         hx-indicator="#processing_indicator" hx-disabled-elt="find input[type='file'], find button">
         <input required type="file" id="upload" name="upload" accept="video/webm"
             class="file-input file-input-bordered file-input-primary md:file-input-lg" />
