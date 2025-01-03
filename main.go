@@ -190,7 +190,7 @@ func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 	duration := time.Since(start)
 	if err != nil {
 		transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "ERROR")))
-		slog.Error("error transcoding file", "error", err)
+		slog.Error("error transcoding file", "filename", fileHeader.Filename, "file_size", fileHeader.Size, "error", err)
 		writeResponse(w, http.StatusOK, "Something went wrong. Please try again later")
 		return
 	}
