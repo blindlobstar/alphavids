@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"html/template"
-	"io"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -204,11 +203,6 @@ func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
-	buf, err := io.ReadAll(file)
-	if err != nil {
-		return "", fmt.Errorf("error reading file into buffer: %w", err)
-	}
-
 	dir, err := os.MkdirTemp(videos_path, "*")
 	if err != nil {
 		return "", fmt.Errorf("error creating tempdir: %w", err)
@@ -229,29 +223,12 @@ func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
 		"-flush_packets", "0",
 		fpath,
 	)
-
 	cmd.Stderr = os.Stderr
-
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return "", fmt.Errorf("error creating stdin pipe: %w", err)
+	cmd.Stdin = file
+	if err := cmd.Run(); err != nil {
+		return "", fmt.Errorf("error running ffmpeg command: %w", err)
 	}
 
-	if err := cmd.Start(); err != nil {
-		return "", fmt.Errorf("error starting command: %w", err)
-	}
-
-	if _, err := stdin.Write(buf); err != nil {
-		return "", fmt.Errorf("error writing buffer into stdin pipe: %w", err)
-	}
-
-	if err := stdin.Close(); err != nil {
-		return "", fmt.Errorf("error closing stdin pipe: %w", err)
-	}
-
-	if err := cmd.Wait(); err != nil {
-		return "", fmt.Errorf("error waiting for command to exit: %w", err)
-	}
 	return fpath, nil
 }
 
