@@ -218,9 +218,6 @@ func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
 		"-alpha_bits", "16",
 		"-profile:v", "4444",
 		"-f", "mov",
-		"-vframes", "150",
-		"-movflags", "frag_keyframe",
-		"-flush_packets", "0",
 		fpath,
 	)
 	cmd.Stderr = os.Stderr
