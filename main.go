@@ -19,6 +19,7 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/prometheus"
 	api "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/metric"
@@ -33,8 +34,6 @@ const (
 var templates *template.Template
 var notFoundFile, notFoundErr = http.Dir("dummy").Open("does-not-exist")
 var meter = otel.Meter("github.com/blindlobstar/alphavids")
-var transcodeErrCounter api.Int64Counter
-var transcodeSuccessCounter api.Int64Counter
 var transcodeHistogram api.Int64Histogram
 
 type noDirFS struct {
@@ -89,24 +88,8 @@ func main() {
 
 	otel.SetMeterProvider(meterProvider)
 
-	transcodeErrCounter, err = meter.Int64Counter("transcode.error.count",
-		api.WithDescription("Number of video transcoded fails"),
-		api.WithUnit("{video}"))
-	if err != nil {
-		slog.Error("error creating metrics", "error", err)
-		return
-	}
-
-	transcodeSuccessCounter, err = meter.Int64Counter("transcode.count",
-		api.WithDescription("Number of video transcoded"),
-		api.WithUnit("{video}"))
-	if err != nil {
-		slog.Error("error creating metrics", "error", err)
-		return
-	}
-
-	transcodeHistogram, err = meter.Int64Histogram("transcode.duration",
-		api.WithDescription("Duration of video transcode"),
+	transcodeHistogram, err = meter.Int64Histogram("alphavids.transcode",
+		api.WithDescription("video transcoding"),
 		api.WithUnit("ms"))
 	if err != nil {
 		slog.Error("error creating metrics", "error", err)
@@ -205,15 +188,14 @@ func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 	fpath, err := transcodeWebmToMOV(file, fileHeader.Filename)
+	duration := time.Since(start)
 	if err != nil {
-		transcodeErrCounter.Add(r.Context(), 1)
+		transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "ERROR")))
 		slog.Error("error transcoding file", "error", err)
 		writeResponse(w, http.StatusOK, "Something went wrong. Please try again later")
 		return
 	}
-	transcodeSuccessCounter.Add(r.Context(), 1)
-	duration := time.Since(start)
-	transcodeHistogram.Record(r.Context(), duration.Milliseconds())
+	transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "OK")))
 
 	w.WriteHeader(http.StatusOK)
 	if err := templates.ExecuteTemplate(w, "video-ready", fpath); err != nil {
