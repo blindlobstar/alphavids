@@ -207,17 +207,13 @@ func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error creating tempdir: %w", err)
 	}
-	fpath := path.Join(dir, strings.TrimSuffix(name, filepath.Ext(name))+".mov")
+	fpath := path.Join(dir, strings.TrimSuffix(name, filepath.Ext(name))+".mp4")
 
 	cmd := exec.Command("ffmpeg",
 		"-vcodec", "libvpx-vp9",
 		"-i", "pipe:0",
-		"-vf", "format=rgba",
-		"-c:v", "prores_ks",
-		"-pix_fmt", "yuva444p10le",
-		"-alpha_bits", "16",
-		"-profile:v", "4444",
-		"-f", "mov",
+		"-c:v", "libx265",
+		"-tag:v", "hvc1",
 		fpath,
 	)
 	cmd.Stderr = os.Stderr
