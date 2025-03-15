@@ -43,7 +43,7 @@ jobs:
         env:
           ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
-      - run: docker stack deploy -c docker-compose.deploy.yaml aplhavids --with-registry-auth
+      - run: docker stack deploy -c docker-compose.deploy.yaml alphavids --with-registry-auth
         env:
           IMAGE: ${{ env.IMAGE }}
           REGISTRY: ${{ env.REGISTRY }}
