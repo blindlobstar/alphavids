@@ -5,12 +5,12 @@ services:
       - backend-network
     volumes:
       - videos:/videos
-    # healthcheck:
-    #   test: "curl -f http://localhost:8080/health || exit"
-    #   interval: 10s
-    #   timeout: 2s
-    #   retries: 3 
-    #   start_period: 10s
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
+      interval: 10s
+      timeout: 2s
+      retries: 3 
+      start_period: 10s
     deploy:
       restart_policy:
         condition: on-failure
