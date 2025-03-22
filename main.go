@@ -124,9 +124,10 @@ func deleteOldFiles(path string) error {
 }
 
 func transcodeHandler(w http.ResponseWriter, r *http.Request) {
+	r.Body = http.MaxBytesReader(w, r.Body, 50<<20)
 	if err := r.ParseMultipartForm(20 << 20); err != nil {
 		slog.Error("error parsing multipart form", "error", err)
-		writeFailedResponse(w, http.StatusBadRequest, "File is too large, max size if 20mb")
+		writeFailedResponse(w, http.StatusBadRequest, "File is too large, max size is 50mb")
 		return
 	}
 
