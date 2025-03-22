@@ -68,7 +68,6 @@ COPY package-lock.json .
 COPY package.json .
 
 COPY tailwind.config.js .
-COPY templates/*.html templates/
 COPY static/* static/
 
 RUN npm install --production=false
@@ -76,7 +75,7 @@ RUN npm install --production=false
 RUN npx tailwindcss -i static/styles.dev.css -o static/styles.css --minify
 
 #build stage
-FROM golang:1.22-alpine AS builder
+FROM golang:1.24.1-alpine AS builder
 RUN apk add --no-cache git
 WORKDIR /go/src/app
 COPY go.mod go.mod
@@ -97,7 +96,6 @@ COPY --from=ffmpeg-builder /usr/local/bin/ffprobe /usr/local/bin/
 
 RUN ldconfig || true
 
-COPY templates /templates
 COPY --from=npm-build /usr/src/app/static /static
 
 COPY --from=builder /go/bin/app /app

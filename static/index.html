@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alphavids | Free transparent WEBM to MP4(mov) converter</title>
+  <meta name="description"
+    content="Easily convert your WEBM videos with alpha channels into MP4 format, ensuring seamless playback on Safari while preserving transparency." />
+  <link href="/styles.css" rel="stylesheet">
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="BgGyFgtRu0nvunDuAigYJA" async></script>
+</head>
+
+<body class="h-screen flex flex-col">
+  <header class="container mx-auto p-4 flex items-center">
+    <div class="text-xl font-bold">ALPHAVIDS.IO</div>
+    <div class="flex ml-4 space-x-3">
+      <a href="https://github.com/blindlobstar" class="text-white/70 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+        </svg>
+      </a>
+      <a href="https://x.com/vrotherford" class="text-white/70 hover:text-white">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+          <path
+            d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+        </svg>
+      </a>
+    </div>
+  </header>
+
+  <main class="container mx-auto flex-grow flex flex-col justify-center items-center px-4">
+    <div class="text-center mb-4">
+      <h1 class="text-3xl font-bold mb-2">
+        Transparent WEBM to MP4
+      </h1>
+
+      <p class="text-white/70 text-sm">
+        Convert transparent videos for Safari compatibility
+      </p>
+    </div>
+
+    <div class="w-full max-w-xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+      <!-- Left side: Conversion Tools -->
+      <div class="space-y-4">
+        <div class="drop-zone flex items-center justify-center rounded-lg cursor-pointer h-40">
+          <div class="text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-white/40 mb-2" fill="none"
+              viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+            </svg>
+            <span class="block text-sm mb-1">Drop WEBM file here</span>
+            <span class="text-xs text-white/50">or click to select</span>
+            <input type="file" class="hidden" accept="video/webm" id="file-input">
+          </div>
+        </div>
+
+        <div class="bg-black/30 border border-white/10 rounded-lg p-4">
+          <div class="text-xs text-white/50 bg-black/40 p-3 rounded border border-white/10 font-mono mb-4">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-gray-400"></span>
+              <span id="status-text">Waiting for file...</span>
+            </div>
+          </div>
+
+          <button id="convert-btn"
+            class="w-full bg-white text-black px-4 py-3 rounded font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled>
+            Convert to MP4
+          </button>
+        </div>
+      </div>
+
+      <!-- Right side: Video Example -->
+      <div class="flex flex-col rounded-lg h-full overflow-hidden">
+        <div class="grow transparent-bg rounded-lg flex items-center justify-center p-2">
+          <video id="demo-video" class="w-full h-auto max-w-full" autoplay loop muted width="480" poster="/sf.png">
+            <source src="/sf.mp4" type="video/quicktime">
+            <source src="/sf.webm" type="video/webm">
+          </video>
+        </div>
+        <div class="mt-2 text-xs text-center text-white/50">
+          Play the video to see transparency in action
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="container mx-auto p-4 text-xs text-white/50 text-center">
+    2025 - built by <a class="text-white/70 hover:text-white underline" href="https://x.com/vrotherford">vrotherford</a>
+    |
+    <a href="https://my.cloudfanatic.net/aff.php?aff=820" class="text-white/70 hover:text-white underline">Hosted by
+      CloudFanatic</a> - Use code <span class="font-semibold text-white/80">KVM10OFF</span> for 10% off
+  </footer>
+
+  <script>
+    const dropZone = document.querySelector('.drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const convertBtn = document.getElementById('convert-btn');
+    const statusText = document.getElementById('status-text');
+    const statusIndicator = document.querySelector('.rounded-full');
+
+    dropZone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileSelected(fileInput.files[0]);
+      }
+    });
+
+    function fileSelected(file) {
+      statusIndicator.classList.remove('bg-gray-400');
+      statusIndicator.classList.remove('bg-red-400');
+      statusIndicator.classList.remove('bg-blue-400');
+      statusIndicator.classList.remove('animate-pulse');
+      statusIndicator.classList.add('bg-green-400');
+      statusText.textContent = `Ready: ${file.name}`;
+      convertBtn.disabled = false;
+    }
+
+    function showInternalError() {
+      showError("Internal error. Try again")
+    }
+
+    function showError(err) {
+      statusIndicator.classList.remove('bg-gray-400');
+      statusIndicator.classList.remove('bg-green-400');
+      statusIndicator.classList.remove('bg-blue-400');
+      statusIndicator.classList.remove('animate-pulse');
+      statusIndicator.classList.add('bg-red-400');
+
+      statusText.textContent = err;
+      convertBtn.disabled = false;
+    }
+
+    // Prevent default behavior for drag events
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, e => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+
+    // Visual feedback when dragging
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => {
+        dropZone.classList.add('bg-white/5');
+        dropZone.style.borderColor = 'rgba(255, 255, 255, 0.4)';
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, () => {
+        dropZone.classList.remove('bg-white/5');
+        dropZone.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+      });
+    });
+
+    // Handle dropped files
+    dropZone.addEventListener('drop', e => {
+      if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        fileSelected(e.dataTransfer.files[0]);
+      }
+    });
+
+    // Simulate conversion process
+    convertBtn.addEventListener('click', () => {
+      statusIndicator.classList.remove('bg-gray-400');
+      statusIndicator.classList.remove('bg-red-400');
+      statusIndicator.classList.remove('bg-green-400');
+      statusIndicator.classList.add('animate-pulse');
+      statusIndicator.classList.add('bg-blue-400');
+      statusText.textContent = "Converting...";
+      convertBtn.disabled = true;
+
+      const formData = new FormData();
+      formData.append("upload", fileInput.files[0]);
+
+      const request = new Request("/transcode", {
+        method: "POST",
+        body: formData,
+      });
+
+      fetch(request)
+        .catch(_ => showInternalError())
+        .then(resp => {
+          if (resp.status != 200) {
+            resp.json().then(data => showError(data.Error), _ => showInternalError());
+            return;
+          }
+          resp.blob()
+            .catch(_ => showInternalError())
+            .then(blob => {
+              statusIndicator.classList.remove('bg-gray-400');
+              statusIndicator.classList.remove('bg-red-400');
+              statusIndicator.classList.remove('bg-blue-400');
+              statusIndicator.classList.remove('animate-pulse');
+              statusIndicator.classList.add('bg-green-400');
+              statusText.textContent = "Conversion complete!";
+
+              var url = window.URL.createObjectURL(blob);
+              var a = document.createElement('a');
+              a.href = url;
+              filename = fileInput.files[0].name;
+              a.download = filename.substr(0, filename.lastIndexOf(".")) + ".mp4";
+              document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+              a.click();
+              a.remove();
+            });
+        });
+    });
+
+  </script>
+</body>
+
+</html>

@@ -1,6 +1,6 @@
 module github.com/blindlobstar/alphavids
 
-go 1.22.1
+go 1.24.1
 
 require (
 	github.com/prometheus/client_golang v1.20.5

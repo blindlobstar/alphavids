@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"html/template"
 	"io/fs"
 	"log"
 	"log/slog"
@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"path"
 	"path/filepath"
 	"strings"
 	"time"
@@ -30,30 +29,8 @@ const (
 	videos_path = "videos"
 )
 
-var templates *template.Template
-var notFoundFile, notFoundErr = http.Dir("dummy").Open("does-not-exist")
 var meter = otel.Meter("github.com/blindlobstar/alphavids")
 var transcodeHistogram api.Int64Histogram
-
-type noDirFS struct {
-	http.Dir
-}
-
-func (m noDirFS) Open(name string) (result http.File, err error) {
-	f, err := m.Dir.Open(name)
-	if err != nil {
-		return
-	}
-
-	fi, err := f.Stat()
-	if err != nil {
-		return
-	}
-	if fi.IsDir() {
-		return notFoundFile, notFoundErr
-	}
-	return f, nil
-}
 
 func main() {
 	var err error
@@ -109,19 +86,10 @@ func main() {
 		}
 	}()
 
-	templates, err = template.ParseGlob("templates/*.html")
-	if err != nil {
-		slog.Error("error parsing templates", "error", err)
-		return
-	}
-
 	http.HandleFunc("POST /transcode", transcodeHandler)
-	http.Handle("GET /videos/", http.StripPrefix("/videos/", http.FileServer(noDirFS{http.Dir(videos_path)})))
-	http.Handle("GET /static/", http.StripPrefix("/static/", http.FileServer(noDirFS{http.Dir("./static")})))
-	http.HandleFunc("GET /upload-form", uploadFormHandler)
+	http.Handle("GET /", http.FileServer(http.Dir("./static")))
 	http.Handle("GET /metrics", promhttp.Handler())
 	http.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) { w.WriteHeader(http.StatusOK) })
-	http.HandleFunc("GET /{$}", indexHandler)
 
 	slog.Info("server started on :8080")
 	if err := http.ListenAndServe(":8080", nil); err != nil {
@@ -130,7 +98,7 @@ func main() {
 }
 
 func deleteOldFiles(path string) error {
-	afterDate := time.Now().Add(-10 * time.Minute)
+	afterDate := time.Now().Add(-120 * time.Second)
 	return filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -155,32 +123,17 @@ func deleteOldFiles(path string) error {
 	})
 }
 
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	if err := templates.ExecuteTemplate(w, "index", nil); err != nil {
-		slog.Error("error executing template", "error", err)
-	}
-}
-
-func uploadFormHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	if err := templates.ExecuteTemplate(w, "form", nil); err != nil {
-		slog.Error("error executing template", "error", err)
-		w.WriteHeader(http.StatusInternalServerError)
-	}
-}
-
 func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseMultipartForm(20 << 20); err != nil {
 		slog.Error("error parsing multipart form", "error", err)
-		writeResponse(w, http.StatusBadRequest, "File is too large, max size if 20mb")
+		writeFailedResponse(w, http.StatusBadRequest, "File is too large, max size if 20mb")
 		return
 	}
 
 	file, fileHeader, err := r.FormFile("upload")
 	if err != nil {
 		slog.Error("error reading file from form", "error", err)
-		writeResponse(w, http.StatusBadRequest, "No file attached")
+		writeFailedResponse(w, http.StatusBadRequest, "No file attached")
 		return
 	}
 	defer file.Close()
@@ -191,15 +144,19 @@ func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "ERROR")))
 		slog.Error("error transcoding file", "filename", fileHeader.Filename, "file_size", fileHeader.Size, "error", err)
-		writeResponse(w, http.StatusOK, "Something went wrong. Please try again later")
+		writeFailedResponse(w, http.StatusInternalServerError, "Something went wrong. Please try again later")
 		return
 	}
 	transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "OK")))
 
-	w.WriteHeader(http.StatusOK)
-	if err := templates.ExecuteTemplate(w, "video-ready", fpath); err != nil {
-		slog.Error("error executing template", "error", err)
-	}
+	defer func() {
+		if err := os.RemoveAll(filepath.Dir(fpath)); err != nil {
+			slog.Error("error removing processed file", "error", err)
+		}
+	}()
+
+	w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(fpath))
+	http.ServeFile(w, r, fpath)
 }
 
 func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
@@ -207,7 +164,7 @@ func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error creating tempdir: %w", err)
 	}
-	fpath := path.Join(dir, strings.TrimSuffix(name, filepath.Ext(name))+".mp4")
+	fpath := filepath.Join(dir, strings.TrimSuffix(name, filepath.Ext(name))+".mp4")
 
 	cmd := exec.Command("ffmpeg",
 		"-vcodec", "libvpx-vp9",
@@ -225,17 +182,14 @@ func transcodeWebmToMOV(file multipart.File, name string) (string, error) {
 	return fpath, nil
 }
 
-type Form struct {
-	ErrorMessage string
+type ErrorResponse struct {
+	Error string
 }
 
-func writeResponse(w http.ResponseWriter, statusCode int, errorMessage string) {
-	var data *Form
-	if len(errorMessage) != 0 {
-		w.WriteHeader(statusCode)
-		data = &Form{ErrorMessage: errorMessage}
-	}
-	if err := templates.ExecuteTemplate(w, "form", data); err != nil {
-		slog.Error("error executing template", "error", err)
+func writeFailedResponse(w http.ResponseWriter, statusCode int, errorMessage string) {
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(ErrorResponse{Error: errorMessage}); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		slog.Error("error writing response", "error", err)
 	}
 }
