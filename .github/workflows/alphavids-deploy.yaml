@@ -28,7 +28,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Build and push prometheus Image
+      - name: Build and push alphavids image
         run: |
           docker build . -t ${{ env.REGISTRY }}/${{ env.IMAGE }}
           docker push ${{ env.REGISTRY }}/${{ env.IMAGE }}
