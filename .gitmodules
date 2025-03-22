@@ -1,0 +1,6 @@
+[submodule "third-party/x265"]
+	path = third-party/x265
+	url = https://bitbucket.org/multicoreware/x265_git.git
+[submodule "third-party/ffmpeg"]
+	path = third-party/ffmpeg
+	url = https://git.ffmpeg.org/ffmpeg.git
