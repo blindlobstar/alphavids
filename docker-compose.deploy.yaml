@@ -19,9 +19,7 @@ services:
       labels:
         - traefik.enable=true
         - traefik.http.routers.alphavids.rule=(Host(`alphavids.io`) || Host(`www.alphavids.io`)) && !Path(`/metrics`) && !Path(`/health`)
-        - traefik.http.routers.alphavids.entrypoints=websecure
-        - traefik.http.routers.alphavids.tls=true
-        - traefik.http.routers.alphavids.tls.certresolver=letsencrypt
+        - traefik.http.routers.alphavids.entrypoints=web
         - traefik.http.services.alphavids.loadbalancer.server.port=8080
   
 volumes:
