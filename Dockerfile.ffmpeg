@@ -1,0 +1,73 @@
+FROM alpine:3.19 AS x265-builder
+
+RUN apk add --no-cache \
+    build-base \
+    cmake \
+    git \
+    pkgconf \
+    yasm \
+    nasm
+
+WORKDIR /src
+COPY third-party/x265 x265/
+
+
+WORKDIR /src/x265/build
+
+RUN cmake ../source \
+    -DENABLE_SHARED=ON \
+    -DENABLE_CLI=ON \
+    -DENABLE_ALPHA=ON \
+    -DCMAKE_SYSTEM_PROCESSOR=x86_64
+
+RUN make && make install
+
+FROM alpine:3.19 AS ffmpeg-builder
+
+COPY --from=x265-builder /usr/local /usr/local
+
+RUN apk add --no-cache \
+    build-base \
+    pkgconf \
+    yasm \
+    nasm \
+    git \
+    coreutils \
+    zlib-dev \
+    libvpx-dev
+
+
+WORKDIR /src
+COPY third-party/ffmpeg ffmpeg/
+
+WORKDIR /src/ffmpeg
+
+RUN ./configure \
+    --prefix=/usr/local \
+    --enable-gpl \
+    --enable-nonfree \
+    --enable-libvpx \
+    --enable-libx265 \
+    --enable-small \
+    --disable-debug \
+    --disable-doc \
+    --disable-ffplay \
+    --disable-network \
+    --disable-xlib \
+    --disable-libxcb \
+    --extra-ldflags="-L/usr/local/lib" \
+    --extra-cflags="-I/usr/local/include" \
+    && make \
+    && make install
+
+
+FROM alpine:3.19
+
+RUN apk --no-cache add libstdc++ libvpx
+
+COPY --from=x265-builder /usr/local/bin/x265 /usr/local/bin/
+COPY --from=x265-builder /usr/local/lib/libx265.so* /usr/local/lib/
+COPY --from=ffmpeg-builder /usr/local/bin/ffmpeg /usr/local/bin/
+COPY --from=ffmpeg-builder /usr/local/bin/ffprobe /usr/local/bin/
+
+RUN ldconfig || true
