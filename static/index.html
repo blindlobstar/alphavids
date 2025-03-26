@@ -13,7 +13,7 @@
 </head>
 
 <body class="h-screen flex flex-col">
-  <header class="container mx-auto p-4 flex items-center">
+  <header class="container w-full p-4 flex items-center">
     <div class="text-xl font-bold">ALPHAVIDS.IO</div>
     <div class="flex ml-4 space-x-3">
       <a href="https://github.com/blindlobstar/alphavids" class="text-white/70 hover:text-white">
@@ -31,8 +31,8 @@
     </div>
   </header>
 
-  <main class="container mx-auto flex-grow flex flex-col justify-center items-center px-4">
-    <div class="text-center mb-4">
+  <main class="container max-w-xl mx-auto flex-grow flex flex-col gap-4 justify-center items-center px-4">
+    <div class="text-center">
       <h1 class="text-3xl font-bold mb-2">
         Transparent WEBM to MP4
       </h1>
@@ -42,7 +42,7 @@
       </p>
     </div>
 
-    <div class="w-full max-w-xl grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+    <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
       <!-- Left side: Conversion Tools -->
       <div class="space-y-4">
         <div class="drop-zone flex items-center justify-center rounded-lg cursor-pointer h-40">
@@ -77,7 +77,8 @@
       <!-- Right side: Video Example -->
       <div class="flex flex-col rounded-lg h-full overflow-hidden">
         <div class="grow transparent-bg rounded-lg flex items-center justify-center p-2">
-          <video id="demo-video" class="w-full h-auto max-w-full" playsinline autoplay loop muted width="480" poster="/sf.png">
+          <video id="demo-video" class="w-full h-auto max-w-full" playsinline autoplay loop muted width="480"
+            poster="/sf.png">
             <source src="/sf.mp4" type="video/quicktime">
             <source src="/sf.webm" type="video/webm">
           </video>
@@ -87,7 +88,38 @@
         </div>
       </div>
     </div>
+
+    <div class="bg-white/5 border border-white/10 rounded-lg p-6 text-white/80 text-xs font-mono">
+      <h2 class="text-sm font-bold mb-4 text-white uppercase tracking-wider">Create Shareholder Value </h2>
+      <div class="space-y-4" style="text-align: justify; line-height: 1.5;">
+        <p>
+          WHEREAS, the undersigned contemplates providing material support to the ongoing technological infrastructure
+          development;</br>
+          AND WHEREAS, such contribution represents a voluntary allocation of resources toward strategic project
+          advancement;</br>
+          NOW, THEREFORE, in consideration of the mutual benefits and collaborative potential herein described, the
+          parties acknowledge the following terms:
+        </p>
+        <p>
+          1. SUPPORT MECHANISM. Support may be rendered through financial or intellectual contributions, hereinafter
+          referred to as "Value Creation Mechanism".</br>
+          2. RESOURCE ALLOCATION. The recipient project retains full discretion in applying contributed resources toward
+          innovation and strategic objectives.</br>
+          3. EXPECTATION DISCLAIMER. No explicit guarantee of monetary return is provided, implied, or expected beyond
+          the intrinsic value of technological progression.</br>
+          4. VOLUNTARY PARTICIPATION. Engagement in the Value Creation Mechanism constitutes an understanding of
+          inherent project development risks.
+        </p>
+      </div>
+      <div class="mt-6">
+        <a href="https://buymeacoffee.com/alphavids"
+          class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md transition-colors text-xs">
+          Support The Project
+        </a>
+      </div>
+    </div>
   </main>
+
 
   <footer class="container mx-auto p-4 text-xs text-white/50 text-center">
     2025 - built by <a class="text-white/70 hover:text-white underline" href="https://x.com/vrotherford">vrotherford</a>
