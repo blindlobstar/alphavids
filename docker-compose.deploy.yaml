@@ -2,7 +2,7 @@ services:
   alphavids:
     image: ${REGISTRY}/${IMAGE}
     networks:
-      - backend-network
+      - internal-network
     volumes:
       - videos:/videos
     healthcheck:
@@ -16,15 +16,10 @@ services:
         condition: on-failure
         delay: 5s
         max_attempts: 3
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.alphavids.rule=(Host(`alphavids.io`) || Host(`www.alphavids.io`)) && !Path(`/metrics`) && !Path(`/health`)
-        - traefik.http.routers.alphavids.entrypoints=web
-        - traefik.http.services.alphavids.loadbalancer.server.port=8080
-  
+
 volumes:
   videos:
 
 networks:
-  backend-network:
+  internal-network:
     external: true
