@@ -1,6 +1,12 @@
+name: alphavids
+
 services:
   alphavids:
-    image: ${REGISTRY}/${IMAGE}
+    image: ${REGISTRY}/alphavids
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64
     networks:
       - internal-network
     volumes:

@@ -1,0 +1,7 @@
+services:
+  ffmpeg:
+    image: ${REGISTRY}/alphavids/ffmpeg
+    build:
+      context: .
+      dockerfile: Dockerfile.ffmpeg
+    platform: linux/amd64
