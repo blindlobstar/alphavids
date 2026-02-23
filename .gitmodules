@@ -4,3 +4,6 @@
 [submodule "third-party/ffmpeg"]
 	path = third-party/ffmpeg
 	url = https://git.ffmpeg.org/ffmpeg.git
+[submodule "infra"]
+	path = infra
+	url = git@github.com:blindlobstar/sandbox.git

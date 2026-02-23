@@ -4,10 +4,21 @@ Transparent WEBM to MP4 converter
 
 ## Setup
 
-* Set `SECRET_FILE` env with path to sops secrets
-* Set `SOPS_AGE_KEY_FILE` env with path to AGE key
-* Login to `ghcr.io` docker registry
-* Add `sandbox` docker context
+* Install [cicdez](https://github.com/blindlobstar/cicdez)
+* Initialize submodules: `git submodule update --init`
+* Add your age key to `~/.config/cicdez/age.key`
+
+## Deploy
+
+```
+make deploy
+```
+
+## Build and push ffmpeg image
+
+```
+make build-ffmpeg
+```
 
 ## Debug
 
