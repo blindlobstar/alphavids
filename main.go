@@ -29,8 +29,10 @@ const (
 	videos_path = "videos"
 )
 
-var meter = otel.Meter("github.com/blindlobstar/alphavids")
-var transcodeHistogram api.Int64Histogram
+var (
+	meter              = otel.Meter("github.com/blindlobstar/alphavids")
+	transcodeHistogram api.Int64Histogram
+)
 
 func main() {
 	var err error
