@@ -17,13 +17,13 @@ RUN npm install --production=false
 RUN npx tailwindcss -i static/styles.dev.css -o static/styles.css --minify
 
 #build stage
-FROM golang:1.24.1-alpine AS builder
+FROM golang:1.25.0-alpine AS builder
 RUN apk add --no-cache git
 WORKDIR /go/src/app
 COPY go.mod go.mod
 COPY go.sum go.sum
 COPY *.go .
-RUN go get -d -v ./...
+RUN go get -v ./...
 RUN go build -o /go/bin/app 
 
 #final stage
