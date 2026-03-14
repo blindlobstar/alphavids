@@ -159,6 +159,22 @@ func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 		writeFailedResponse(w, http.StatusBadRequest, "Bad filename")
 		return
 	}
+
+	buf := make([]byte, 512)
+	n, err := file.Read(buf)
+	if err != nil {
+		slog.InfoContext(r.Context(), "error reading file to buffer", "error", err)
+		writeFailedResponse(w, http.StatusBadRequest, "Bad file")
+		return
+	}
+	file.Seek(0, 0)
+	contentType := http.DetectContentType(buf[:n])
+	if contentType != "video/webm" {
+		slog.InfoContext(r.Context(), "file is not a webm")
+		writeFailedResponse(w, http.StatusBadRequest, "File is not a Webm video")
+		return
+	}
+
 	start := time.Now()
 	fpath, err := transcodeWebmToMOV(file, filename)
 	duration := time.Since(start)
