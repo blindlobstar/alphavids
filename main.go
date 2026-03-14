@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"log/slog"
+	"mime"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -32,6 +33,7 @@ const (
 var (
 	meter              = otel.Meter("github.com/blindlobstar/alphavids")
 	transcodeHistogram api.Int64Histogram
+	root               *os.Root
 )
 
 func main() {
@@ -79,6 +81,12 @@ func main() {
 		return
 	}
 
+	root, err = os.OpenRoot(videos_path)
+	if err != nil {
+		slog.Error("error open root", "error", err)
+		return
+	}
+
 	ticker := time.NewTicker(time.Minute)
 	go func() {
 		for range ticker.C {
@@ -121,7 +129,7 @@ func deleteOldFiles(path string) error {
 			return nil
 		}
 
-		return os.RemoveAll(filepath.Dir(path))
+		return root.RemoveAll(filepath.Dir(path))
 	})
 }
 
@@ -141,24 +149,34 @@ func transcodeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer file.Close()
 
+	if fileHeader.Filename == "" {
+		writeFailedResponse(w, http.StatusBadRequest, "Empty filename")
+		return
+	}
+
+	filename := filepath.Base(filepath.Clean(fileHeader.Filename))
+	if _, err := root.Stat(filename); !os.IsNotExist(err) {
+		writeFailedResponse(w, http.StatusBadRequest, "Bad filename")
+		return
+	}
 	start := time.Now()
-	fpath, err := transcodeWebmToMOV(file, fileHeader.Filename)
+	fpath, err := transcodeWebmToMOV(file, filename)
 	duration := time.Since(start)
 	if err != nil {
 		transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "ERROR")))
-		slog.Error("error transcoding file", "filename", fileHeader.Filename, "file_size", fileHeader.Size, "error", err)
+		slog.Error("error transcoding file", "filename", filename, "file_size", fileHeader.Size, "error", err)
 		writeFailedResponse(w, http.StatusInternalServerError, "Something went wrong. Please try again later")
 		return
 	}
 	transcodeHistogram.Record(r.Context(), duration.Milliseconds(), api.WithAttributes(attribute.String("status", "OK")))
 
 	defer func() {
-		if err := os.RemoveAll(filepath.Dir(fpath)); err != nil {
+		if err := root.RemoveAll(filepath.Dir(fpath)); err != nil {
 			slog.Error("error removing processed file", "error", err)
 		}
 	}()
 
-	w.Header().Set("Content-Disposition", "attachment; filename="+filepath.Base(fpath))
+	w.Header().Set("Content-Disposition", mime.FormatMediaType("attachment", map[string]string{"filename": filepath.Base(fpath)}))
 	http.ServeFile(w, r, fpath)
 }
 
